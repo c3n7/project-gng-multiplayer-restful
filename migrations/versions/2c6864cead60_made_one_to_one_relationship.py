@@ -1,8 +1,8 @@
-"""user and score tables
+"""made one to one relationship
 
-Revision ID: b55ade62a8a9
+Revision ID: 2c6864cead60
 Revises: 
-Create Date: 2020-12-11 12:52:35.527470
+Create Date: 2020-12-11 14:12:26.466362
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b55ade62a8a9'
+revision = '2c6864cead60'
 down_revision = None
 branch_labels = None
 depends_on = None

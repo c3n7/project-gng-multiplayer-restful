@@ -1,4 +1,5 @@
-from app import api
+from app import api, db
+from app.models import User, Score
 """ TODO: Put something meaningful"""
 import os
 import json
@@ -8,54 +9,77 @@ from flask_restful import Resource, reqparse
 parser = reqparse.RequestParser()
 
 # For the code resource
-parser.add_argument("code")
-parser.add_argument("test")
+parser.add_argument("score")
+parser.add_argument("name")
 
 CODE = {}
+status = {}
 
 
 class HelloWorld(Resource):
     """Returns hello world"""
 
     def get(self):
-        return {'noma': 'tupu'}
+        return {'hello': 'world'}
 
 
-class EvalCode(Resource):
-    """Runs code and returns the result"""
-
+class SetScore(Resource):
     def get(self):
-        return CODE
+        return status
 
     def post(self):
         args = parser.parse_args()
-        CODE = {
-            "code": args["code"],
-            "test": args["test"]
-        }
+        user = User.query.filter_by(name=args["name"]).first()
+        score = Score(score=int(args["score"]), user=user)
+        db.session.add(score)
+        try:
+            db.session.commit()
+            status = {
+                "success": True,
+                "user": args["name"],
+                "score": args["score"]
+            }
+        except Exception as _e:
+            # TODO: Log the exception
+            # log your exception in the way you want -> log to file, log as error with default logging, send by email. It's upon you
+            db.session.rollback()
+            db.session.flush()  # for resetting non-commited .add()
+            status = {
+                "success": False,
+                "user": args["name"],
+                "score": args["score"]
+            }
 
-        # Write the code file to disk
-        os.mkdir("tmp")
-        with open("tmp/user_code.py", 'w') as f:
-            f.write(CODE["code"])
+        return status, 201
 
-        with open("tmp/test_code.py", 'w') as f:
-            f.write(CODE["test"])
 
-        os.system("py.test --json-report")
-        RESULT = {}
+class AddUser(Resource):
+    def get(self):
+        return status
 
-        with open(".report.json") as f:
-            RESULT = json.load(f)
+    def post(self):
+        args = parser.parse_args()
+        user = User(name=args["name"])
+        db.session.add(user)
+        try:
+            db.session.commit()
+            status = {
+                "success": True,
+                "user": args["name"]
+            }
+        except Exception as _e:
+            # TODO: Log the exception
+            # log your exception in the way you want -> log to file, log as error with default logging, send by email. It's upon you
+            db.session.rollback()
+            db.session.flush()  # for resetting non-commited .add()
+            status = {
+                "success": False,
+                "user": args["name"]
+            }
 
-        # A bit of clean up
-        shutil.rmtree("tmp")
-        os.remove(".report.json")
-
-        # Return the goodies
-        print(json.dumps(RESULT, indent=1))
-        return RESULT, 201
+        return status, 201
 
 
 api.add_resource(HelloWorld, '/')
-api.add_resource(EvalCode, "/code/")
+api.add_resource(AddUser, "/add_user/")
+api.add_resource(SetScore, "/set_score/")
