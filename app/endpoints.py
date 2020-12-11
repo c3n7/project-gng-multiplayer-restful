@@ -30,7 +30,24 @@ class SetScore(Resource):
     def post(self):
         args = parser.parse_args()
         user = User.query.filter_by(name=args["name"]).first()
-        score = Score(score=int(args["score"]), user=user)
+        if user == None:
+            status = {
+                "success": False,
+                "user": args["name"],
+                "score": args["score"],
+                "message": "User does not exist"
+            }
+
+            return status, 422
+
+        # Check if the user's score exists
+        score = Score.query.filter_by(user=user).first()
+        if score == None:
+            # The user's score does not exist, add new
+            score = Score(score=int(args["score"]), user=user)
+        else:
+            score.score = int(args["score"])
+
         db.session.add(score)
         try:
             db.session.commit()
@@ -51,6 +68,11 @@ class SetScore(Resource):
             }
 
         return status, 201
+
+
+class GetAllScores(Resource):
+    def get(self):
+        return "yes"
 
 
 class AddUser(Resource):

@@ -1,8 +1,8 @@
-"""Made foreign key unique
+"""Added default value
 
-Revision ID: 5e222230624f
+Revision ID: bc30cbed7d11
 Revises: 
-Create Date: 2020-12-11 14:23:00.439978
+Create Date: 2020-12-11 14:49:04.434997
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '5e222230624f'
+revision = 'bc30cbed7d11'
 down_revision = None
 branch_labels = None
 depends_on = None
