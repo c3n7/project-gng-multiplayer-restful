@@ -29,6 +29,7 @@ class GetScore(Resource):
 
     def post(self):
         args = parser.parse_args()
+        rank = 0
         user = User.query.filter_by(name=args["name"]).first()
         if user == None:
             status = {
@@ -46,12 +47,25 @@ class GetScore(Resource):
                     "user": args["name"],
                     "message": "User has no score"
                 }
-              # The user's score does not exist, add new
             else:
+                # Get user's rank
+                users = User.query.all()
+                unsorted_users = {}
+                for user in users:
+                    unsorted_users[user.name] = user.score.score
+                sorted_users = dict(
+                    sorted(unsorted_users.items(),
+                           key=lambda item: item[1], reverse=True))
+                for i in range(len(sorted_users)):
+                    if args["name"] == list(sorted_users.keys())[i]:
+                        rank = i + 1
+                        break
+
                 status = {
                     "success": True,
                     "user": args["name"],
-                    "score": score.score
+                    "score": score.score,
+                    "rank": rank
                 }
             return status, 200
 
@@ -112,6 +126,9 @@ class GetAllScores(Resource):
 
         sorted_users = dict(
             sorted(status.items(), key=lambda item: item[1], reverse=True))
+        for i in range(len(sorted_users)):
+            print(list(sorted_users.values())[i])
+
         return sorted_users
 
 
