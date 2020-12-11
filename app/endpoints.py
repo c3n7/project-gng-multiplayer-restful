@@ -115,7 +115,9 @@ class AddUser(Resource):
     def post(self):
         args = parser.parse_args()
         user = User(name=args["name"])
+        score = Score(score=0, user=user)
         db.session.add(user)
+        db.session.add(score)
         try:
             db.session.commit()
             status = {
