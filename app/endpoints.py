@@ -110,7 +110,9 @@ class GetAllScores(Resource):
         for user in users:
             status[user.name] = user.score.score
 
-        return status
+        sorted_users = dict(
+            sorted(status.items(), key=lambda item: item[1], reverse=True))
+        return sorted_users
 
 
 class AddUser(Resource):
