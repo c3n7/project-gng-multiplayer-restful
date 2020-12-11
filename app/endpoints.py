@@ -104,8 +104,13 @@ class SetScore(Resource):
 
 
 class GetAllScores(Resource):
+
     def get(self):
-        return "yes"
+        users = User.query.all()
+        for user in users:
+            status[user.name] = user.score.score
+
+        return status
 
 
 class AddUser(Resource):
@@ -141,3 +146,4 @@ api.add_resource(HelloWorld, '/')
 api.add_resource(AddUser, "/add_user/")
 api.add_resource(GetScore, "/get_score/")
 api.add_resource(SetScore, "/set_score/")
+api.add_resource(GetAllScores, "/get_all_scores/")
