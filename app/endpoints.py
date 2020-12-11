@@ -11,6 +11,7 @@ parser = reqparse.RequestParser()
 # For the code resource
 parser.add_argument("score")
 parser.add_argument("name")
+parser.add_argument("new_name")
 
 CODE = {}
 status = {}
@@ -161,8 +162,54 @@ class AddUser(Resource):
         return status, 201
 
 
+class UpdateUser(Resource):
+    def post(self):
+        args = parser.parse_args()
+        user = User.query.filter_by(name=args["name"]).first()
+
+        if args["new_name"] == None or args["name"] == None:
+            status = {
+                "success": False,
+                "user": args["name"],
+                "message": "Missing Arguments"
+            }
+            return status
+
+        if user == None:
+            status = {
+                "success": False,
+                "user": args["name"],
+                "message": "User does not exist"
+            }
+            return status
+        else:
+            user.name = args["new_name"]
+            db.session.add(user)
+
+        try:
+            db.session.commit()
+            status = {
+                "success": True,
+                "user": user.name,
+                "old_name": args["name"]
+            }
+        except Exception as _e:
+            # TODO: Log the exception
+            # log your exception in the way you want -> log to file, log as error with default logging, send by email. It's upon you
+            db.session.rollback()
+            db.session.flush()  # for resetting non-commited .add()
+            status = {
+                "success": False,
+                "user": args["name"],
+                "unadded_name": args["name"]
+            }
+
+        return status
+
+
 api.add_resource(HelloWorld, '/')
 api.add_resource(AddUser, "/add_user/")
+api.add_resource(UpdateUser, "/update_user/")
 api.add_resource(GetScore, "/get_score/")
 api.add_resource(SetScore, "/set_score/")
 api.add_resource(GetAllScores, "/get_all_scores/")
