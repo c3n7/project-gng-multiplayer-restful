@@ -16,7 +16,8 @@ class Score(db.Model):
     __tablename__ = 'score'
     id = db.Column(db.Integer, primary_key=True)
     score = db.Column(db.Integer)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(
+        'user.id'), nullable=False, unique=True)
 
     def __repr__(self):
         return '<Score %r>' % self.score

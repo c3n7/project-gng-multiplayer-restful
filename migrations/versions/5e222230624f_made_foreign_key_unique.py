@@ -1,8 +1,8 @@
-"""made one to one relationship
+"""Made foreign key unique
 
-Revision ID: 2c6864cead60
+Revision ID: 5e222230624f
 Revises: 
-Create Date: 2020-12-11 14:12:26.466362
+Create Date: 2020-12-11 14:23:00.439978
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2c6864cead60'
+revision = '5e222230624f'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,7 +29,8 @@ def upgrade():
     sa.Column('score', sa.Integer(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('user_id')
     )
     # ### end Alembic commands ###
 
