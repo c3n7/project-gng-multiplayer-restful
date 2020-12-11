@@ -23,6 +23,39 @@ class HelloWorld(Resource):
         return {'hello': 'world'}
 
 
+class GetScore(Resource):
+    def get(self):
+        return status
+
+    def post(self):
+        args = parser.parse_args()
+        user = User.query.filter_by(name=args["name"]).first()
+        if user == None:
+            status = {
+                "success": False,
+                "user": args["name"],
+                "message": "User does not exist"
+            }
+
+            return status, 422
+        else:
+            score = Score.query.filter_by(user=user).first()
+            if score == None:
+                status = {
+                    "success": False,
+                    "user": args["name"],
+                    "message": "User has no score"
+                }
+              # The user's score does not exist, add new
+            else:
+                status = {
+                    "success": True,
+                    "user": args["name"],
+                    "score": score.score
+                }
+            return status, 200
+
+
 class SetScore(Resource):
     def get(self):
         return status
@@ -104,4 +137,5 @@ class AddUser(Resource):
 
 api.add_resource(HelloWorld, '/')
 api.add_resource(AddUser, "/add_user/")
+api.add_resource(GetScore, "/get_score/")
 api.add_resource(SetScore, "/set_score/")
