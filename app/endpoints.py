@@ -127,8 +127,6 @@ class GetAllScores(Resource):
 
         sorted_users = dict(
             sorted(status.items(), key=lambda item: item[1], reverse=True))
-        for i in range(len(sorted_users)):
-            print(list(sorted_users.values())[i])
 
         return sorted_users
 
