@@ -182,7 +182,6 @@ class UpdateUser(Resource):
             return status
         else:
             user.name = args["new_name"].lower()
-            #  db.session.add(user)
 
         try:
             db.session.commit()
