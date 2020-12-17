@@ -31,11 +31,11 @@ class GetScore(Resource):
     def post(self):
         args = parser.parse_args()
         rank = 0
-        user = User.query.filter_by(name=args["name"]).first()
+        user = User.query.filter_by(name=args["name"].lower()).first()
         if user == None:
             status = {
                 "success": False,
-                "user": args["name"],
+                "user": args["name"].lower(),
                 "message": "User does not exist"
             }
 
@@ -45,7 +45,7 @@ class GetScore(Resource):
             if score == None:
                 status = {
                     "success": False,
-                    "user": args["name"],
+                    "user": args["name"].lower(),
                     "message": "User has no score"
                 }
             else:
@@ -58,13 +58,13 @@ class GetScore(Resource):
                     sorted(unsorted_users.items(),
                            key=lambda item: item[1], reverse=True))
                 for i in range(len(sorted_users)):
-                    if args["name"] == list(sorted_users.keys())[i]:
+                    if args["name"].lower() == list(sorted_users.keys())[i]:
                         rank = i + 1
                         break
 
                 status = {
                     "success": True,
-                    "user": args["name"],
+                    "user": args["name"].lower(),
                     "score": score.score,
                     "rank": rank
                 }
@@ -77,11 +77,11 @@ class SetScore(Resource):
 
     def post(self):
         args = parser.parse_args()
-        user = User.query.filter_by(name=args["name"]).first()
+        user = User.query.filter_by(name=args["name"].lower()).first()
         if user == None:
             status = {
                 "success": False,
-                "user": args["name"],
+                "user": args["name"].lower(),
                 "score": args["score"],
                 "message": "User does not exist"
             }
@@ -101,7 +101,7 @@ class SetScore(Resource):
             db.session.commit()
             status = {
                 "success": True,
-                "user": args["name"],
+                "user": args["name"].lower(),
                 "score": args["score"]
             }
         except Exception as _e:
@@ -111,7 +111,7 @@ class SetScore(Resource):
             db.session.flush()  # for resetting non-commited .add()
             status = {
                 "success": False,
-                "user": args["name"],
+                "user": args["name"].lower(),
                 "score": args["score"]
             }
 
@@ -137,7 +137,7 @@ class AddUser(Resource):
 
     def post(self):
         args = parser.parse_args()
-        user = User(name=args["name"])
+        user = User(name=args["name"].lower())
         score = Score(score=0, user=user)
         db.session.add(user)
         db.session.add(score)
@@ -145,7 +145,7 @@ class AddUser(Resource):
             db.session.commit()
             status = {
                 "success": True,
-                "user": args["name"]
+                "user": args["name"].lower()
             }
         except Exception as _e:
             # TODO: Log the exception
@@ -154,7 +154,7 @@ class AddUser(Resource):
             db.session.flush()  # for resetting non-commited .add()
             status = {
                 "success": False,
-                "user": args["name"]
+                "user": args["name"].lower()
             }
 
         return status, 201
@@ -163,12 +163,12 @@ class AddUser(Resource):
 class UpdateUser(Resource):
     def post(self):
         args = parser.parse_args()
-        user = User.query.filter_by(name=args["name"]).first()
+        user = User.query.filter_by(name=args["name"].lower()).first()
 
         if args["new_name"] == None or args["name"] == None:
             status = {
                 "success": False,
-                "user": args["name"],
+                "user": args["name"].lower(),
                 "message": "Missing Arguments"
             }
             return status
@@ -176,20 +176,20 @@ class UpdateUser(Resource):
         if user == None:
             status = {
                 "success": False,
-                "user": args["name"],
+                "user": args["name"].lower(),
                 "message": "User does not exist"
             }
             return status
         else:
-            user.name = args["new_name"]
-            db.session.add(user)
+            user.name = args["new_name"].lower()
+            #  db.session.add(user)
 
         try:
             db.session.commit()
             status = {
                 "success": True,
                 "user": user.name,
-                "old_name": args["name"]
+                "old_name": args["name"].lower()
             }
         except Exception as _e:
             # TODO: Log the exception
@@ -198,8 +198,8 @@ class UpdateUser(Resource):
             db.session.flush()  # for resetting non-commited .add()
             status = {
                 "success": False,
-                "user": args["name"],
-                "unadded_name": args["name"]
+                "user": args["name"].lower(),
+                "unadded_name": args["name"].lower()
             }
 
         return status
